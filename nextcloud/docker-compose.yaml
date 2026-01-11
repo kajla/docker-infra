@@ -1,0 +1,81 @@
+version: "3"
+services:
+  mysql:
+    # Note: Check the recommend version here: https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html#server
+    image: mariadb:lts
+    command: --transaction-isolation=READ-COMMITTED
+    container_name: mysql
+    restart: unless-stopped
+    volumes:
+      - /srv/docker/mysql:/var/lib/mysql:Z
+    environment:
+      - MARIADB_AUTO_UPGRADE=1
+      #- MARIADB_DISABLE_UPGRADE_BACKUP=1
+    networks:
+      - backend
+    env_file:
+      - db.env
+      - db-root.env
+
+  app:
+    image: nextcloud:fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - /srv/data/nextcloud:/var/www/html:z
+    environment:
+      - MYSQL_HOST=mysql
+      - REDIS_HOST=redis
+      - OVERWRITEPROTOCOL=https
+    env_file:
+      - db.env
+      - nextcloud.env
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - mysql
+
+  web:
+    image: nginx:stable-alpine-slim
+    restart: unless-stopped
+    volumes:
+      - /srv/data/nextcloud:/var/www/html:z,ro
+      - /opt/docker/nextcloud/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - backend
+
+  cron:
+    image: nextcloud:fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - /srv/data/nextcloud:/var/www/html:z
+    entrypoint: /cron.sh
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - mysql
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - /srv/data/redis:/data:Z
+    networks:
+      - backend
+
+  clamav:
+    image: clamav/clamav:stable_base
+    container_name: clamav
+    restart: unless-stopped
+    volumes:
+      - /srv/data/clamav:/var/lib/clamav:Z
+    networks:
+      - backend
+    
+networks:
+  backend:
+    external: true

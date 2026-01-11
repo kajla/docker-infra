@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  esphome:
+    image: ghcr.io/esphome/esphome
+    container_name: esphome
+    volumes:
+      - /srv/data/esphome:/config:rw,Z
+      # Use local time for logging timestamps
+      - /etc/localtime:/etc/localtime:ro
+    #devices:
+      # if needed, add esp device(s) as in command line examples above
+      #- /dev/ttyUSB0:/dev/ttyUSB0
+      #- /dev/ttyACM0:/dev/ttyACM0
+    # The host networking driver only works on Linux hosts, but is available as a Beta feature,
+    # on Docker Desktop version 4.29 and later.
+    network_mode: host
+    restart: unless-stopped

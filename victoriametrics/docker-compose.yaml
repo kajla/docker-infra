@@ -1,0 +1,15 @@
+services:
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    restart: unless-stopped
+    container_name: victoriametrics
+    ports:
+      - "8428:8428"
+    volumes:
+      - /srv/data/victoriametrics:/victoria-metrics-data:Z
+    networks:
+      - backend
+    command: -retentionPeriod=3y
+networks:
+  backend:
+    external: true

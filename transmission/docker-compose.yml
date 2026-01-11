@@ -1,0 +1,26 @@
+---
+services:
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    user: 473:475
+    container_name: transmission
+    env_file:
+      - data.env
+
+    environment:
+      - PUID=473
+      - PGID=475
+      - TZ=Europe/Budapest
+#      - PEERPORT= #optional
+#      - HOST_WHITELIST= #optional
+    volumes:
+      - /srv/docker/transmission:/config
+      - /adatok:/adatok
+      - /home/torrent:/home/torrent
+      - /home/torrent/toshiba:/home/torrent/toshiba
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
