@@ -1,6 +1,8 @@
 services:
   watchtower:
     container_name: watchtower
+    env_file:
+      - data.env
     environment:
       - WATCHTOWER_CLEANUP=true
     volumes:
