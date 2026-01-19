@@ -2,10 +2,10 @@ services:
   watchtower:
     container_name: watchtower
     environment:
-      - TZ=Europe/Budapest
       - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE="0 0 4 * * *"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    image: containrrr/watchtower
-    command: --schedule "0 0 4 * * *"
+    image: nickfedor/watchtower
